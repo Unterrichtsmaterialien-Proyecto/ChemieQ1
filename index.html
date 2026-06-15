@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elektrolyse von Zinkbromid</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #4c8ccc;
+        color: #333;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      #canvas-container {
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+      }
+      #ui-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        pointer-events: none;
+      }
+      .label {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 2px solid #ccc;
+        font-size: 14px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      #title {
+        top: 20px;
+        width: 100%;
+        text-align: center;
+        font-size: 28px;
+        font-weight: bold;
+        position: absolute;
+        text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8);
+      }
+      #label-kathode {
+        top: 15%;
+        left: 10%;
+        border-color: #2b78e4;
+      }
+      #label-anode {
+        top: 15%;
+        right: 10%;
+        border-color: #cc0000;
+      }
+      #label-red {
+        top: 60%;
+        left: 5%;
+      }
+      #label-ox {
+        top: 60%;
+        right: 5%;
+      }
+      #label-solution {
+        bottom: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+      }
+
+      .highlight-blue {
+        color: #2b78e4;
+        font-weight: bold;
+      }
+      .highlight-red {
+        color: #cc0000;
+        font-weight: bold;
+      }
+      .highlight-yellow {
+        color: #d4a017;
+        font-weight: bold;
+      }
+
+      /* Styling for Oxidation Numbers */
+      rt {
+        font-size: 11px;
+        font-weight: bold;
+        color: #555;
+        font-family: 'Times New Roman', Times, serif;
+        letter-spacing: 1px;
+      }
+
+      nav {
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        z-index: 10;
+      }
+
+      a {
+        color: #000000;
+        cursor: pointer;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  </head>
+  <body>
+    <nav>
+      <a href="./NewPEMFC.html">PEM Fuel Cell</a>
+      <a href="./lokalelement.html">Korrosion</a>
+    </nav>
+
+    <div id="ui-layer">
+      <div id="title">Elektrolyse von Zinkbromid (ZnBr₂)</div>
+
+      <div class="label" id="label-kathode">
+        <span class="highlight-blue">KATHODE (-)</span><br />
+        Zinkabscheidung (Zn)<br />
+        <i
+          >Pro Zn²⁺ werden
+          <span class="highlight-yellow">2 e⁻</span> aufgenommen</i
+        >
+      </div>
+
+      <div class="label" id="label-anode">
+        <span class="highlight-red">ANODE (+)</span><br />
+        Brom-Bildung (Br₂ gelöst)<br />
+        <i>Pro Br⁻ wird <span class="highlight-yellow">1 e⁻</span> abgegeben</i>
+      </div>
+
+      <div class="label" id="label-red">
+        <b>Reduktion:</b><br /><br />
+        <ruby>Zn²⁺<rt>+II</rt></ruby> + 2e⁻ → <ruby>Zn<rt>±0</rt></ruby
+        >(s)
+      </div>
+
+      <div class="label" id="label-ox">
+        <b>Oxidation:</b><br /><br />
+        2<ruby>Br⁻<rt>-I</rt></ruby> → <ruby>Br₂<rt>±0</rt></ruby
+        >(aq) + 2e⁻
+      </div>
+
+      <div class="label" id="label-solution">
+        <b>Zinkbromid-Lösung (ZnBr₂ aq.)</b><br />
+        <span class="highlight-blue">Zn²⁺ Wanderung (links)</span> |
+        <span class="highlight-red">Br⁻ Wanderung (rechts)</span>
+      </div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script>
+      // 1. Scene Setup
+      const scene = new THREE.Scene()
+      const camera = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      )
+      camera.position.set(0, 0, 18)
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+      renderer.setSize(window.innerWidth, window.innerHeight)
+      document
+        .getElementById('canvas-container')
+        .appendChild(renderer.domElement)
+
+      // 2. Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7)
+      scene.add(ambientLight)
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8)
+      dirLight.position.set(5, 10, 7)
+      scene.add(dirLight)
+
+      // 3. Materials
+      const glassMat = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        transmission: 0.9,
+        opacity: 1,
+        metalness: 0,
+        roughness: 0.1,
+        ior: 1.5,
+        transparent: true,
+        side: THREE.DoubleSide
+      })
+      const liquidMat = new THREE.MeshPhysicalMaterial({
+        color: 0xddddaa,
+        transmission: 0.8,
+        transparent: true,
+        opacity: 0.5,
+        roughness: 0.2
+      })
+      const electrodeMat = new THREE.MeshStandardMaterial({
+        color: 0x222222,
+        roughness: 0.9
+      })
+
+      const zincIonMat = new THREE.MeshStandardMaterial({
+        color: 0xa0b0c0,
+        metalness: 0.2,
+        roughness: 0.5
+      })
+      const zincMetalMat = new THREE.MeshStandardMaterial({
+        color: 0x797979,
+        metalness: 0.4,
+        roughness: 0.2
+      })
+      const bromideIonMat = new THREE.MeshStandardMaterial({
+        color: 0xce6b1a,
+        roughness: 0.7
+      })
+      const bromineMoleculeMat = new THREE.MeshStandardMaterial({
+        color: 0x973112,
+        transparent: true,
+        opacity: 0.9,
+        roughness: 0.6
+      })
+      const electronMat = new THREE.MeshBasicMaterial({ color: 0xffea00 }) // Glowing yellow
+
+      // 4. Constructing the U-Tube Path & Wires
+      const path = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-4, 4, 0),
+        new THREE.Vector3(-4, -3, 0),
+        new THREE.Vector3(0, -5, 0),
+        new THREE.Vector3(4, -3, 0),
+        new THREE.Vector3(4, 4, 0)
+      ])
+
+      const tubeGeo = new THREE.TubeGeometry(path, 64, 1.5, 32, false)
+      const tubeMesh = new THREE.Mesh(tubeGeo, glassMat)
+      scene.add(tubeMesh)
+
+      const liquidGeo = new THREE.TubeGeometry(path, 64, 1.35, 32, false)
+      const liquidMesh = new THREE.Mesh(liquidGeo, liquidMat)
+      scene.add(liquidMesh)
+
+      const electrodeGeo = new THREE.CylinderGeometry(0.4, 0.4, 5, 32)
+      const cathode = new THREE.Mesh(electrodeGeo, electrodeMat)
+      cathode.position.set(-4, 3, 0)
+      scene.add(cathode)
+
+      const anode = new THREE.Mesh(electrodeGeo, electrodeMat)
+      anode.position.set(4, 3, 0)
+      scene.add(anode)
+
+      // Wires
+      const wireGeo = new THREE.CylinderGeometry(0.06, 0.06, 4, 16)
+      const wireKat = new THREE.Mesh(
+        wireGeo,
+        new THREE.MeshBasicMaterial({ color: 0x2b78e4 })
+      )
+      wireKat.position.set(-4, 7, 0)
+      scene.add(wireKat)
+
+      const wireAn = new THREE.Mesh(
+        wireGeo,
+        new THREE.MeshBasicMaterial({ color: 0xcc0000 })
+      )
+      wireAn.position.set(4, 7, 0)
+      scene.add(wireAn)
+
+      // 5. Particle Systems
+      const activeZincIons = []
+      const activeBromideIons = []
+      const zincDeposits = []
+      const bromineMolecules = []
+      const activeElectrons = []
+
+      const ionGeo = new THREE.SphereGeometry(0.2, 16, 16)
+      const electronGeo = new THREE.SphereGeometry(0.12, 16, 16)
+
+      const maxParticles = 10
+      let pendingBr = 0
+
+      function getRandomOffset() {
+        const angle = Math.random() * Math.PI * 2
+        const radius = Math.random() * 0.9
+        return new THREE.Vector3(
+          Math.cos(angle) * radius,
+          (Math.random() - 0.5) * 0.5,
+          Math.sin(angle) * radius
+        )
+      }
+
+      function spawnZinc() {
+        let zn = new THREE.Mesh(ionGeo, zincIonMat)
+        zn.userData = {
+          t: 0.4 + Math.random() * 0.2,
+          targetT: 0.12 + Math.random() * 0.04,
+          speed: 0.0005 + Math.random() * 0.0005,
+          offset: getRandomOffset()
+        }
+        scene.add(zn)
+        activeZincIons.push(zn)
+      }
+
+      function spawnBromide() {
+        let br = new THREE.Mesh(ionGeo, bromideIonMat)
+        br.userData = {
+          t: 0.4 + Math.random() * 0.2,
+          targetT: 0.84 + Math.random() * 0.04,
+          speed: 0.0005 + Math.random() * 0.0005,
+          offset: getRandomOffset()
+        }
+        scene.add(br)
+        activeBromideIons.push(br)
+      }
+
+      function spawnElectron(x, startY, endY, isUpward, offsetZ) {
+        let e = new THREE.Mesh(electronGeo, electronMat)
+        e.position.set(x + (Math.random() - 0.5) * 0.1, startY, offsetZ)
+        e.userData = { endY: endY, isUpward: isUpward, speed: 0.15 }
+        scene.add(e)
+        activeElectrons.push(e)
+      }
+
+      for (let i = 0; i < maxParticles; i++) {
+        spawnZinc()
+        spawnBromide()
+      }
+
+      // 6. Animation Loop
+      function animate() {
+        requestAnimationFrame(animate)
+
+        // Process Zinc (Reduction)
+        for (let i = activeZincIons.length - 1; i >= 0; i--) {
+          let zn = activeZincIons[i]
+          zn.userData.t -= zn.userData.speed
+
+          let pos = path.getPointAt(Math.max(0, zn.userData.t))
+          zn.position.copy(pos).add(zn.userData.offset)
+
+          if (zn.userData.t <= zn.userData.targetT) {
+            // Spawn 2 electrons moving DOWN the cathode wire
+            spawnElectron(-4, 9, 4, false, 0.2)
+            spawnElectron(-4, 9.5, 4, false, -0.2)
+
+            zn.material = zincMetalMat
+            zn.position.x = -4 + Math.cos(Math.random() * Math.PI * 2) * 0.45
+            zn.position.z = Math.sin(Math.random() * Math.PI * 2) * 0.45
+
+            zincDeposits.push(zn)
+            activeZincIons.splice(i, 1)
+
+            if (zincDeposits.length > 30) {
+              let oldZn = zincDeposits.shift()
+              scene.remove(oldZn)
+            }
+            spawnZinc()
+          }
+        }
+
+        // Process Bromide (Oxidation)
+        for (let i = activeBromideIons.length - 1; i >= 0; i--) {
+          let br = activeBromideIons[i]
+          br.userData.t += br.userData.speed
+
+          let pos = path.getPointAt(Math.min(1, br.userData.t))
+          br.position.copy(pos).add(br.userData.offset)
+
+          if (br.userData.t >= br.userData.targetT) {
+            scene.remove(br)
+            activeBromideIons.splice(i, 1)
+
+            // Spawn 1 electron moving UP the anode wire per Br-
+            spawnElectron(4, 4, 9, true, (Math.random() - 0.5) * 0.2)
+
+            pendingBr++
+            // Combine 2 Br- into 1 Br2 Molecule
+            if (pendingBr >= 2) {
+              pendingBr = 0
+
+              let br2 = new THREE.Group()
+              let atom1 = new THREE.Mesh(ionGeo, bromineMoleculeMat)
+              let atom2 = new THREE.Mesh(ionGeo, bromineMoleculeMat)
+              atom1.position.x = -0.15
+              atom2.position.x = 0.15
+              br2.add(atom1)
+              br2.add(atom2)
+
+              br2.position.set(
+                4 + (Math.random() - 0.5) * 1.2,
+                pos.y + (Math.random() - 0.5) * 2,
+                (Math.random() - 0.5) * 1.2
+              )
+              scene.add(br2)
+              bromineMolecules.push(br2)
+
+              if (bromineMolecules.length > 25) {
+                let oldBr2 = bromineMolecules.shift()
+                scene.remove(oldBr2)
+              }
+            }
+            spawnBromide()
+          }
+        }
+
+        // Animate Electrons along the wires
+        for (let i = activeElectrons.length - 1; i >= 0; i--) {
+          let e = activeElectrons[i]
+          if (e.userData.isUpward) {
+            e.position.y += e.userData.speed
+            if (e.position.y > e.userData.endY) {
+              scene.remove(e)
+              activeElectrons.splice(i, 1)
+            }
+          } else {
+            e.position.y -= e.userData.speed
+            if (e.position.y < e.userData.endY) {
+              scene.remove(e)
+              activeElectrons.splice(i, 1)
+            }
+          }
+        }
+
+        // Animate Dissolved Br2 Molecules (Drifting around the Anode)
+        for (let i = bromineMolecules.length - 1; i >= 0; i--) {
+          let b = bromineMolecules[i]
+          b.position.x += (Math.random() - 0.5) * 0.015
+          b.position.y += (Math.random() - 0.5) * 0.015
+          b.position.z += (Math.random() - 0.5) * 0.015
+
+          if (b.position.y > 2.5) b.position.y = 2.5
+          if (b.position.y < -1.5) b.position.y = -1.5
+
+          let dx = b.position.x - 4
+          let dz = b.position.z
+          let dist = Math.sqrt(dx * dx + dz * dz)
+          if (dist > 1.1) {
+            b.position.x = 4 + (dx / dist) * 1.1
+            b.position.z = (dz / dist) * 1.1
+          }
+
+          b.rotation.x += 0.02
+          b.rotation.y += 0.03
+        }
+
+        // Subtle rotation for 3D perspective
+        scene.rotation.y = Math.sin(Date.now() * 0.0003) * 0.1
+
+        renderer.render(scene, camera)
+      }
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight
+        camera.updateProjectionMatrix()
+        renderer.setSize(window.innerWidth, window.innerHeight)
+      })
+
+      animate()
+    </script>
+  </body>
+</html>
+

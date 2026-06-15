@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Erweiterte 3D Korrosion auf Molekularebene</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #1a1a1a;
+      }
+      #ui-container {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        width: 80%;
+        max-width: 650px;
+      }
+      button {
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        background: #0056b3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        transition: background 0.3s;
+      }
+      button:hover {
+        background: #003d82;
+      }
+      #info {
+        margin-bottom: 10px;
+        font-weight: bold;
+        font-size: 18px;
+        color: #222;
+      }
+      #subinfo {
+        margin-bottom: 15px;
+        font-size: 14px;
+        color: #555;
+      }
+      #instructions {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: white;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 10px;
+        border-radius: 8px;
+        pointer-events: none;
+        font-size: 14px;
+      }
+
+      /* New Legend Styles */
+      #legend {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 14px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .legend-item:last-child {
+        margin-bottom: 0;
+      }
+      .color-box {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        margin-right: 10px;
+        border: 1px solid #555;
+      }
+      nav {
+        position: absolute;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 10;
+      }
+
+      a {
+        color: #ffffff;
+        cursor: pointer;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  </head>
+  <body>
+    <div id="instructions">
+      Mausklick Links: Drehen<br />
+      Mausrad: Zoomen<br />
+      Mausklick Rechts: Verschieben
+    </div>
+
+    <nav>
+      <a href="./index.html">Zinkbromid-Elektrolyse</a>
+      <a href="./NewPEMFC.html">PEM Fuel Cell</a>
+    </nav>
+
+    <div id="legend">
+      <div
+        style="
+          font-weight: bold;
+          margin-bottom: 10px;
+          border-bottom: 1px solid #555;
+          padding-bottom: 5px;
+        "
+      >
+        Legende
+      </div>
+      <div class="legend-item">
+        <div class="color-box" style="background: #888888"></div>
+        Fe (Eisen, intakt)
+      </div>
+      <div class="legend-item">
+        <div class="color-box" style="background: #aaaa55"></div>
+        Fe²⁺ (Oxidiertes Eisen)
+      </div>
+      <div class="legend-item">
+        <div class="color-box" style="background: #8b4513"></div>
+        FeO(OH) (Rost / Fe³⁺)
+      </div>
+      <div class="legend-item">
+        <div class="color-box" style="background: #ff3333"></div>
+        O (Sauerstoff)
+      </div>
+      <div class="legend-item">
+        <div class="color-box" style="background: #ffffff"></div>
+        H (Wasserstoff)
+      </div>
+      <div class="legend-item">
+        <div class="color-box" style="background: #ffff00"></div>
+        e⁻ (Elektron)
+      </div>
+    </div>
+
+    <div id="ui-container">
+      <div id="info">Schritt 0: Intaktes Eisengitter</div>
+      <div id="subinfo">Oxidationszahl: Fe(0)</div>
+      <button id="nextBtn">Nächster Schritt</button>
+    </div>
+
+    <script>
+      const scene = new THREE.Scene()
+      scene.background = new THREE.Color(0x222222)
+
+      const camera = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      )
+      camera.position.set(10, 8, 15)
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true })
+      renderer.setSize(window.innerWidth, window.innerHeight)
+      document.body.appendChild(renderer.domElement)
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement)
+      controls.enableDamping = true
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
+      scene.add(ambientLight)
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8)
+      dirLight.position.set(10, 20, 10)
+      scene.add(dirLight)
+
+      // Materials
+      const ironMat = new THREE.MeshStandardMaterial({
+        color: 0x888888,
+        metalness: 0.8,
+        roughness: 0.4
+      })
+      const fe2Mat = new THREE.MeshStandardMaterial({
+        color: 0xaaaa55,
+        metalness: 0.5,
+        roughness: 0.6
+      })
+      const fe3Mat = new THREE.MeshStandardMaterial({
+        color: 0x8b4513,
+        metalness: 0.1,
+        roughness: 1.0
+      })
+      const oxMat = new THREE.MeshStandardMaterial({ color: 0xff3333 })
+      const hydMat = new THREE.MeshStandardMaterial({ color: 0xffffff })
+      const electronMat = new THREE.MeshBasicMaterial({ color: 0xffff00 })
+
+      function createLabel(text, color = 'white') {
+        const canvas = document.createElement('canvas')
+        const context = canvas.getContext('2d')
+        canvas.width = 128
+        canvas.height = 64
+        context.font = 'Bold 20px Arial'
+        context.fillStyle = color
+        context.textAlign = 'center'
+        context.fillText(text, 64, 40)
+        const texture = new THREE.CanvasTexture(canvas)
+        const spriteMat = new THREE.SpriteMaterial({
+          map: texture,
+          depthTest: false
+        })
+        const sprite = new THREE.Sprite(spriteMat)
+        sprite.scale.set(1.5, 0.75, 1)
+        sprite.position.y = 0.6
+        return sprite
+      }
+
+      function createWater() {
+        const group = new THREE.Group()
+        const oxygen = new THREE.Mesh(
+          new THREE.SphereGeometry(0.3, 16, 16),
+          oxMat
+        )
+        const h1 = new THREE.Mesh(
+          new THREE.SphereGeometry(0.15, 16, 16),
+          hydMat
+        )
+        const h2 = new THREE.Mesh(
+          new THREE.SphereGeometry(0.15, 16, 16),
+          hydMat
+        )
+        h1.position.set(0.25, 0.2, 0)
+        h2.position.set(-0.25, 0.2, 0)
+        group.add(oxygen, h1, h2)
+        group.add(createLabel('H₂O', '#ffffff'))
+        return group
+      }
+
+      function createOxygen() {
+        const group = new THREE.Group()
+        const o1 = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), oxMat)
+        const o2 = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), oxMat)
+        o1.position.set(0.2, 0, 0)
+        o2.position.set(-0.2, 0, 0)
+        group.add(o1, o2)
+        group.add(createLabel('O₂ (0)', '#ff8888'))
+        return group
+      }
+
+      // Helper: Create OH- Ion
+      function createOH() {
+        const group = new THREE.Group()
+        const oxygen = new THREE.Mesh(
+          new THREE.SphereGeometry(0.3, 16, 16),
+          oxMat
+        )
+        const h1 = new THREE.Mesh(
+          new THREE.SphereGeometry(0.15, 16, 16),
+          hydMat
+        )
+        h1.position.set(0.25, 0.2, 0)
+        group.add(oxygen, h1)
+        const label = createLabel('OH⁻ (-I)', '#88ffff')
+        label.position.y = 0.6
+        group.add(label)
+        return group
+      }
+
+      const ironAtoms = []
+      const waterMolecules = []
+      const oxygenMolecules = []
+      const ohMolecules = []
+      const electrons = []
+      let currentStep = 0
+
+      const gridSize = 7
+      const spacing = 1.2
+
+      for (let x = -gridSize / 2; x < gridSize / 2; x++) {
+        for (let y = 0; y > -3; y--) {
+          for (let z = -gridSize / 2; z < gridSize / 2; z++) {
+            const mesh = new THREE.Mesh(
+              new THREE.SphereGeometry(0.5, 32, 32),
+              ironMat
+            )
+            mesh.position.set(x * spacing, y * spacing, z * spacing)
+            mesh.userData = { originalY: y * spacing, isTop: y === 0 }
+
+            if (y === 0) {
+              const label = createLabel('0', 'transparent')
+              mesh.add(label)
+              mesh.userData.label = label
+            }
+            scene.add(mesh)
+            ironAtoms.push(mesh)
+          }
+        }
+      }
+
+      const infoText = document.getElementById('info')
+      const subinfoText = document.getElementById('subinfo')
+
+      document.getElementById('nextBtn').addEventListener('click', () => {
+        currentStep++
+        if (currentStep > 4) currentStep = 0
+        executeStep(currentStep)
+      })
+
+      function executeStep(step) {
+        if (step === 1) {
+          infoText.innerText = 'Schritt 1: Adsorption von H₂O'
+          subinfoText.innerText =
+            'Wasser lagert sich an das intakte Eisengitter an.'
+
+          for (let i = 0; i < 8; i++) {
+            const w = createWater()
+            w.position.set(
+              (Math.random() - 0.5) * 6,
+              4 + Math.random() * 2,
+              (Math.random() - 0.5) * 6
+            )
+            w.userData = { targetY: 0.8 }
+            scene.add(w)
+            waterMolecules.push(w)
+          }
+        } else if (step === 2) {
+          infoText.innerText =
+            'Schritt 2: Elektrochemische Reaktion & OH⁻ Bildung'
+          subinfoText.innerText =
+            'Anodisch: Fe -> Fe²⁺ + 2e⁻ | Kathodisch: O₂ + 2H₂O + 4e⁻ -> 4OH⁻'
+
+          for (let i = 0; i < 4; i++) {
+            const o2 = createOxygen()
+            o2.position.set(
+              (Math.random() - 0.5) * 4,
+              4,
+              (Math.random() - 0.5) * 4
+            )
+            o2.userData = { targetY: 1.5 + Math.random() * 0.5 }
+            scene.add(o2)
+            oxygenMolecules.push(o2)
+          }
+
+          // Keep the anodic oxidation stoichiometric with the adsorbed water:
+          //   2 Fe + O2 + 2 H2O -> 2 Fe(2+) + 4 OH(-)   =>   Fe : H2O = 1 : 1
+          // so each H2O molecule oxidizes exactly one surface Fe atom. A water
+          // reacts with the nearest top atom it is in contact with (horizontal
+          // x/z plane) that has not already been oxidized in this step.
+          const contactRadius = 1.0
+          waterMolecules.forEach(w => {
+            let atom = null
+            let minDist = contactRadius
+            ironAtoms.forEach(candidate => {
+              if (!candidate.userData.isTop || candidate.material === fe2Mat) {
+                return
+              }
+              const dx = w.position.x - candidate.position.x
+              const dz = w.position.z - candidate.position.z
+              const dist = Math.sqrt(dx * dx + dz * dz)
+              if (dist < minDist) {
+                minDist = dist
+                atom = candidate
+              }
+            })
+            if (!atom) return
+
+            atom.material = fe2Mat
+            atom.userData.label.material.map = createLabel(
+              '+II',
+              '#ffff00'
+            ).material.map
+
+            for (let e = 0; e < 2; e++) {
+              const el = new THREE.Mesh(
+                new THREE.SphereGeometry(0.1, 8, 8),
+                electronMat
+              )
+              el.position.copy(atom.position)
+              el.userData = {
+                target: new THREE.Vector3(
+                  (Math.random() - 0.5) * 4,
+                  1.5,
+                  (Math.random() - 0.5) * 4
+                ),
+                progress: 0
+              }
+              scene.add(el)
+              electrons.push(el)
+            }
+
+            // Cathodic reduction yields hydroxide: O2 + 2 H2O + 4 e- -> 4 OH-,
+            // i.e. 2 OH- per oxidized Fe2+. They spread across the surface
+            // rather than sticking to the anode, so some end up as surplus
+            // over bare iron in the next step.
+            for (let n = 0; n < 2; n++) {
+              setTimeout(() => {
+                const oh = createOH()
+                oh.position.set(
+                  atom.position.x + (Math.random() - 0.5) * 4,
+                  1.5,
+                  atom.position.z + (Math.random() - 0.5) * 4
+                )
+                scene.add(oh)
+                ohMolecules.push(oh)
+              }, 1000)
+            }
+          })
+
+          waterMolecules.forEach(w => scene.remove(w))
+        } else if (step === 3) {
+          infoText.innerText =
+            'Schritt 3: Bildung von Fe(OH)₂ und Oxidation zu FeO(OH)'
+          subinfoText.innerText =
+            'Fe²⁺ + 2OH⁻ -> Fe(OH)₂ -> FeO(OH). Überschüssige OH⁻ + O₂ oxidieren weiteres Fe(0).'
+
+          electrons.forEach(e => scene.remove(e))
+          electrons.length = 0
+
+          // Reactants float just above the surface atoms, so contact is judged
+          // in the horizontal (x/z) plane.
+          const contactRadius = 1.5
+          const horizDist = (a, b) =>
+            Math.sqrt(
+              (a.position.x - b.position.x) ** 2
+                + (a.position.z - b.position.z) ** 2
+            )
+
+          // Turn an atom into rust (FeO(OH)) with its O-H decoration.
+          const formFeOOH = atom => {
+            atom.material = fe3Mat
+            atom.userData.label.material.map = createLabel(
+              '+III',
+              '#ff8800'
+            ).material.map
+            atom.userData.targetY = atom.position.y + 0.8 + Math.random()
+            const oMesh = new THREE.Mesh(new THREE.SphereGeometry(0.25), oxMat)
+            const hMesh = new THREE.Mesh(new THREE.SphereGeometry(0.15), hydMat)
+            oMesh.position.set(0.4, 0.4, 0)
+            hMesh.position.set(0.6, 0.6, 0)
+            atom.add(oMesh)
+            atom.add(hMesh)
+          }
+
+          // Consumable reactant pools left over from step 2.
+          const availableOH = ohMolecules.slice()
+          const availableO2 = oxygenMolecules.slice()
+          const consumeOH = oh => {
+            scene.remove(oh)
+            availableOH.splice(availableOH.indexOf(oh), 1)
+          }
+
+          // Reaction A: Fe²⁺ + 2 OH⁻ -> Fe(OH)₂ -> FeO(OH).
+          // A Fe²⁺ ion in contact with two hydroxide ions rusts, consuming them.
+          ironAtoms.forEach(atom => {
+            if (!atom.userData.isTop || atom.material !== fe2Mat) return
+            const nearby = availableOH
+              .filter(oh => horizDist(oh, atom) < contactRadius)
+              .sort((a, b) => horizDist(a, atom) - horizDist(b, atom))
+            if (nearby.length < 2) return
+            consumeOH(nearby[0])
+            consumeOH(nearby[1])
+            formFeOOH(atom)
+          })
+
+          // Reaction B: surplus OH⁻ + O₂ oxidize bare Fe(0) -> Fe²⁺.
+          // 2 Fe + O₂ + 2 H₂O -> 2 Fe²⁺ + 4 OH⁻, so each O₂ oxidizes up to two
+          // iron atoms, each of which also needs a leftover hydroxide nearby.
+          const FE0_PER_O2 = 2
+          const o2Usage = new Map()
+          ironAtoms.forEach(atom => {
+            if (!atom.userData.isTop || atom.material !== ironMat) return
+            const ohIdx = availableOH.findIndex(
+              oh => horizDist(oh, atom) < contactRadius
+            )
+            if (ohIdx === -1) return
+            const o2 = availableO2.find(
+              o =>
+                horizDist(o, atom) < contactRadius
+                && (o2Usage.get(o) || 0) < FE0_PER_O2
+            )
+            if (!o2) return
+            consumeOH(availableOH[ohIdx])
+            o2Usage.set(o2, (o2Usage.get(o2) || 0) + 1)
+            atom.material = fe2Mat
+            atom.userData.label.material.map = createLabel(
+              '+II',
+              '#ffff00'
+            ).material.map
+          })
+
+          // Remove the reactants now that they have reacted or dispersed.
+          ohMolecules.forEach(oh => scene.remove(oh))
+          ohMolecules.length = 0
+          oxygenMolecules.forEach(o => scene.remove(o))
+          oxygenMolecules.length = 0
+
+          // Deepen the pit: hide a sub-surface atom under the rusted core.
+          ironAtoms.forEach(atom => {
+            const dist = Math.sqrt(atom.position.x ** 2 + atom.position.z ** 2)
+            if (atom.userData.originalY === -spacing && dist < 1.5) {
+              atom.visible = false
+            }
+          })
+        } else if (step === 4) {
+          infoText.innerText = 'Schritt 4: Ausbreitung der Korrosionsgrube'
+          subinfoText.innerText =
+            'Sauerstoff und Wasser dringen durch die poröse FeO(OH)-Schicht. Die Grube wächst.'
+          ironAtoms.forEach(atom => {
+            const dist = Math.sqrt(atom.position.x ** 2 + atom.position.z ** 2)
+            if (atom.userData.isTop && dist < 3.5 && dist >= 2.5) {
+              atom.material = fe3Mat
+              atom.userData.label.material.map = createLabel(
+                '+III',
+                '#ff8800'
+              ).material.map
+              atom.userData.targetY = atom.position.y + 0.5 + Math.random()
+            } else if (
+              atom.userData.originalY >= -spacing * 2
+              && atom.userData.originalY < 0
+              && dist < 2.5
+            ) {
+              atom.visible = false
+            }
+          })
+        } else if (step === 0) {
+          infoText.innerText = 'Schritt 0: Intaktes Eisengitter'
+          subinfoText.innerText = 'Oxidationszahl: Fe(0)'
+
+          waterMolecules.forEach(w => scene.remove(w))
+          oxygenMolecules.forEach(o => scene.remove(o))
+          ohMolecules.forEach(oh => scene.remove(oh))
+          electrons.forEach(e => scene.remove(e))
+          waterMolecules.length = 0
+          oxygenMolecules.length = 0
+          ohMolecules.length = 0
+          electrons.length = 0
+
+          ironAtoms.forEach(atom => {
+            atom.material = ironMat
+            atom.visible = true
+            atom.position.y = atom.userData.originalY
+            atom.userData.targetY = null
+            while (atom.children.length > 1) {
+              atom.remove(atom.children[atom.children.length - 1])
+            }
+            if (atom.userData.label) {
+              atom.userData.label.material.map = createLabel('0', 'transparent').material.map
+            }
+          })
+        }
+      }
+
+      function animate() {
+        requestAnimationFrame(animate)
+        controls.update()
+
+        const speed = 0.05
+        waterMolecules.forEach(w => {
+          if (w.position.y > w.userData.targetY) w.position.y -= speed
+        })
+        oxygenMolecules.forEach(o => {
+          if (o.position.y > o.userData.targetY) o.position.y -= speed
+        })
+
+        ironAtoms.forEach(atom => {
+          if (
+            atom.userData.targetY
+            && atom.position.y < atom.userData.targetY
+          ) {
+            atom.position.y += speed * 0.5
+          }
+        })
+
+        electrons.forEach(el => {
+          if (el.userData.progress < 1) {
+            el.userData.progress += 0.02
+            el.position.lerp(el.userData.target, el.userData.progress)
+            el.position.y += Math.sin(el.userData.progress * Math.PI) * 0.1
+          } else {
+            el.visible = false
+          }
+        })
+
+        renderer.render(scene, camera)
+      }
+      animate()
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight
+        camera.updateProjectionMatrix()
+        renderer.setSize(window.innerWidth, window.innerHeight)
+      })
+    </script>
+  </body>
+</html>
+
