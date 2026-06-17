@@ -60,7 +60,7 @@
         font-size: 14px;
       }
 
-      /* New Legend Styles */
+      /* new legendary style*/
       #legend {
         position: absolute;
         top: 20px;
@@ -253,7 +253,7 @@
         return group
       }
 
-      // Helper: Create OH- Ion
+      // create OH-
       function createOH() {
         const group = new THREE.Group()
         const oxygen = new THREE.Mesh(
@@ -347,11 +347,10 @@
             oxygenMolecules.push(o2)
           }
 
-          // Keep the anodic oxidation stoichiometric with the adsorbed water:
+          // anodic oxidation stoichiometric with the adsorbed water:
           //   2 Fe + O2 + 2 H2O -> 2 Fe(2+) + 4 OH(-)   =>   Fe : H2O = 1 : 1
-          // so each H2O molecule oxidizes exactly one surface Fe atom. A water
-          // reacts with the nearest top atom it is in contact with (horizontal
-          // x/z plane) that has not already been oxidized in this step.
+          // a water reacts with the nearest top atom it is in contact with
+          // that has not already been oxidized in this step (horizontal x/z plane)
           const contactRadius = 1.0
           waterMolecules.forEach(w => {
             let atom = null
@@ -394,7 +393,7 @@
               electrons.push(el)
             }
 
-            // Cathodic reduction yields hydroxide: O2 + 2 H2O + 4 e- -> 4 OH-,
+            // Cathodic reduction yields hydroxide: O2 + 2 H2O + 4 e- -> 4 OH-
             // i.e. 2 OH- per oxidized Fe2+. They spread across the surface
             // rather than sticking to the anode, so some end up as surplus
             // over bare iron in the next step.
@@ -422,7 +421,7 @@
           electrons.forEach(e => scene.remove(e))
           electrons.length = 0
 
-          // Reactants float just above the surface atoms, so contact is judged
+          // Reactants float just above the surface atoms contact is judged
           // in the horizontal (x/z) plane.
           const contactRadius = 1.5
           const horizDist = (a, b) =>
@@ -431,7 +430,7 @@
                 + (a.position.z - b.position.z) ** 2
             )
 
-          // Turn an atom into rust (FeO(OH)) with its O-H decoration.
+          // tturn Fe2+ into (FeO(OH)) und keeps OH on top
           const formFeOOH = atom => {
             atom.material = fe3Mat
             atom.userData.label.material.map = createLabel(
@@ -456,7 +455,7 @@
           }
 
           // Reaction A: Fe²⁺ + 2 OH⁻ -> Fe(OH)₂ -> FeO(OH).
-          // A Fe²⁺ ion in contact with two hydroxide ions rusts, consuming them.
+          // Fe²⁺ ion in contact with OH- oxidize, consuming them.
           ironAtoms.forEach(atom => {
             if (!atom.userData.isTop || atom.material !== fe2Mat) return
             const nearby = availableOH
