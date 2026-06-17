@@ -328,7 +328,7 @@
       function animate() {
         requestAnimationFrame(animate)
 
-        // Process Zinc (Reduction)
+        // Process Zinc Red
         for (let i = activeZincIons.length - 1; i >= 0; i--) {
           let zn = activeZincIons[i]
           zn.userData.t -= zn.userData.speed
@@ -356,7 +356,7 @@
           }
         }
 
-        // Process Bromide (Oxidation)
+        // Process Bromide Oxi
         for (let i = activeBromideIons.length - 1; i >= 0; i--) {
           let br = activeBromideIons[i]
           br.userData.t += br.userData.speed
@@ -372,7 +372,7 @@
             spawnElectron(4, 4, 9, true, (Math.random() - 0.5) * 0.2)
 
             pendingBr++
-            // Combine 2 Br- into 1 Br2 Molecule
+            // 2 Br- into 1 Br2
             if (pendingBr >= 2) {
               pendingBr = 0
 
@@ -401,7 +401,7 @@
           }
         }
 
-        // Animate Electrons along the wires
+        // Electrones on wire
         for (let i = activeElectrons.length - 1; i >= 0; i--) {
           let e = activeElectrons[i]
           if (e.userData.isUpward) {
@@ -419,7 +419,7 @@
           }
         }
 
-        // Animate Dissolved Br2 Molecules (Drifting around the Anode)
+        // Br2 drift anode
         for (let i = bromineMolecules.length - 1; i >= 0; i--) {
           let b = bromineMolecules[i]
           b.position.x += (Math.random() - 0.5) * 0.015
@@ -441,7 +441,7 @@
           b.rotation.y += 0.03
         }
 
-        // Subtle rotation for 3D perspective
+        // Rotation
         scene.rotation.y = Math.sin(Date.now() * 0.0003) * 0.1
 
         renderer.render(scene, camera)
