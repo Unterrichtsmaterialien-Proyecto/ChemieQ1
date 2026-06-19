@@ -181,7 +181,7 @@
       dirLight.position.set(10, 20, 10)
       scene.add(dirLight)
 
-      // Materials
+ 
       const ironMat = new THREE.MeshStandardMaterial({
         color: 0x888888,
         metalness: 0.8,
@@ -253,7 +253,7 @@
         return group
       }
 
-      // create OH-
+   
       function createOH() {
         const group = new THREE.Group()
         const oxygen = new THREE.Mesh(
@@ -347,10 +347,7 @@
             oxygenMolecules.push(o2)
           }
 
-          // anodic oxidation stoichiometric with the adsorbed water:
-          //   2 Fe + O2 + 2 H2O -> 2 Fe(2+) + 4 OH(-)   =>   Fe : H2O = 1 : 1
-          // a water reacts with the nearest top atom it is in contact with
-          // that has not already been oxidized in this step (horizontal x/z plane)
+   
           const contactRadius = 1.0
           waterMolecules.forEach(w => {
             let atom = null
@@ -393,10 +390,6 @@
               electrons.push(el)
             }
 
-            // Cathodic reduction yields hydroxide: O2 + 2 H2O + 4 e- -> 4 OH-
-            // i.e. 2 OH- per oxidized Fe2+. They spread across the surface
-            // rather than sticking to the anode, so some end up as surplus
-            // over bare iron in the next step.
             for (let n = 0; n < 2; n++) {
               setTimeout(() => {
                 const oh = createOH()
@@ -421,8 +414,7 @@
           electrons.forEach(e => scene.remove(e))
           electrons.length = 0
 
-          // Reactants float just above the surface atoms contact is judged
-          // in the horizontal (x/z) plane.
+        
           const contactRadius = 1.5
           const horizDist = (a, b) =>
             Math.sqrt(
@@ -430,7 +422,6 @@
                 + (a.position.z - b.position.z) ** 2
             )
 
-          // tturn Fe2+ into (FeO(OH)) und keeps OH on top
           const formFeOOH = atom => {
             atom.material = fe3Mat
             atom.userData.label.material.map = createLabel(
@@ -446,7 +437,7 @@
             atom.add(hMesh)
           }
 
-          // Consumable reactant pools left over from step 2.
+     
           const availableOH = ohMolecules.slice()
           const availableO2 = oxygenMolecules.slice()
           const consumeOH = oh => {
@@ -454,8 +445,7 @@
             availableOH.splice(availableOH.indexOf(oh), 1)
           }
 
-          // Reaction A: Fe²⁺ + 2 OH⁻ -> Fe(OH)₂ -> FeO(OH).
-          // Fe²⁺ ion in contact with OH- oxidize, consuming them.
+ 
           ironAtoms.forEach(atom => {
             if (!atom.userData.isTop || atom.material !== fe2Mat) return
             const nearby = availableOH
@@ -467,9 +457,7 @@
             formFeOOH(atom)
           })
 
-          // Reaction B: surplus OH⁻ + O₂ oxidize bare Fe(0) -> Fe²⁺.
-          // 2 Fe + O₂ + 2 H₂O -> 2 Fe²⁺ + 4 OH⁻, so each O₂ oxidizes up to two
-          // iron atoms, each of which also needs a leftover hydroxide nearby.
+   
           const FE0_PER_O2 = 2
           const o2Usage = new Map()
           ironAtoms.forEach(atom => {
@@ -493,13 +481,12 @@
             ).material.map
           })
 
-          // Remove the reactants now that they have reacted or dispersed.
           ohMolecules.forEach(oh => scene.remove(oh))
           ohMolecules.length = 0
           oxygenMolecules.forEach(o => scene.remove(o))
           oxygenMolecules.length = 0
 
-          // Deepen the pit: hide a sub-surface atom under the rusted core.
+
           ironAtoms.forEach(atom => {
             const dist = Math.sqrt(atom.position.x ** 2 + atom.position.z ** 2)
             if (atom.userData.originalY === -spacing && dist < 1.5) {
