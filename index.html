@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="de">
+// Lest nicht den Code, lernt lieber für die Klausur!!
+<html lang="de"> 
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -85,7 +86,6 @@
         font-weight: bold;
       }
 
-      /* Styling for Oxidation Numbers */
       rt {
         font-size: 11px;
         font-weight: bold;
@@ -154,7 +154,7 @@
     <div id="canvas-container"></div>
 
     <script>
-      // 1. Scene Setup
+      // Scene
       const scene = new THREE.Scene()
       const camera = new THREE.PerspectiveCamera(
         45,
@@ -170,14 +170,14 @@
         .getElementById('canvas-container')
         .appendChild(renderer.domElement)
 
-      // 2. Lighting
+      // Lighting
       const ambientLight = new THREE.AmbientLight(0xffffff, 0.7)
       scene.add(ambientLight)
       const dirLight = new THREE.DirectionalLight(0xffffff, 0.8)
       dirLight.position.set(5, 10, 7)
       scene.add(dirLight)
 
-      // 3. Materials
+      // Material
       const glassMat = new THREE.MeshPhysicalMaterial({
         color: 0xffffff,
         transmission: 0.9,
@@ -222,7 +222,7 @@
       })
       const electronMat = new THREE.MeshBasicMaterial({ color: 0xffea00 }) // Glowing yellow
 
-      // 4. Constructing the U-Tube Path & Wires
+      // youtube path & wires
       const path = new THREE.CatmullRomCurve3([
         new THREE.Vector3(-4, 4, 0),
         new THREE.Vector3(-4, -3, 0),
@@ -248,7 +248,7 @@
       anode.position.set(4, 3, 0)
       scene.add(anode)
 
-      // Wires
+      // wires
       const wireGeo = new THREE.CylinderGeometry(0.06, 0.06, 4, 16)
       const wireKat = new THREE.Mesh(
         wireGeo,
@@ -264,7 +264,7 @@
       wireAn.position.set(4, 7, 0)
       scene.add(wireAn)
 
-      // 5. Particle Systems
+      // particle systems
       const activeZincIons = []
       const activeBromideIons = []
       const zincDeposits = []
@@ -324,11 +324,11 @@
         spawnBromide()
       }
 
-      // 6. Animation Loop
+      // animation loop
       function animate() {
         requestAnimationFrame(animate)
 
-        // Process Zinc Red
+        // Process Zincooo Red
         for (let i = activeZincIons.length - 1; i >= 0; i--) {
           let zn = activeZincIons[i]
           zn.userData.t -= zn.userData.speed
@@ -337,7 +337,7 @@
           zn.position.copy(pos).add(zn.userData.offset)
 
           if (zn.userData.t <= zn.userData.targetT) {
-            // Spawn 2 electrons moving DOWN the cathode wire
+            // zwo electrons moving DOWN the cathode wire
             spawnElectron(-4, 9, 4, false, 0.2)
             spawnElectron(-4, 9.5, 4, false, -0.2)
 
@@ -356,7 +356,7 @@
           }
         }
 
-        // Process Bromide Oxi
+        // Process Bromidico aanion Oxi
         for (let i = activeBromideIons.length - 1; i >= 0; i--) {
           let br = activeBromideIons[i]
           br.userData.t += br.userData.speed
@@ -368,11 +368,11 @@
             scene.remove(br)
             activeBromideIons.splice(i, 1)
 
-            // Spawn 1 electron moving UP the anode wire per Br-
+            // one electron moving UP the anode wire pro 1 Br-
             spawnElectron(4, 4, 9, true, (Math.random() - 0.5) * 0.2)
 
             pendingBr++
-            // 2 Br- into 1 Br2
+            // 2 Br- marriage to 1 Br2
             if (pendingBr >= 2) {
               pendingBr = 0
 
@@ -401,7 +401,7 @@
           }
         }
 
-        // Electrones on wire
+        // e- on the hot tin roof
         for (let i = activeElectrons.length - 1; i >= 0; i--) {
           let e = activeElectrons[i]
           if (e.userData.isUpward) {
