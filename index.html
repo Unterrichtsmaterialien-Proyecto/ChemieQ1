@@ -217,9 +217,9 @@
         opacity: 0.9,
         roughness: 0.6
       })
-      const electronMat = new THREE.MeshBasicMaterial({ color: 0xffea00 }) // Glowing yellow
+      const electronMat = new THREE.MeshBasicMaterial({ color: 0xffea00 })
 
-      // youtube path & wires
+
       const path = new THREE.CatmullRomCurve3([
         new THREE.Vector3(-4, 4, 0),
         new THREE.Vector3(-4, -3, 0),
@@ -245,7 +245,6 @@
       anode.position.set(4, 3, 0)
       scene.add(anode)
 
-      // wires
       const wireGeo = new THREE.CylinderGeometry(0.06, 0.06, 4, 16)
       const wireKat = new THREE.Mesh(
         wireGeo,
@@ -261,7 +260,6 @@
       wireAn.position.set(4, 7, 0)
       scene.add(wireAn)
 
-      // particle systems
       const activeZincIons = []
       const activeBromideIons = []
       const zincDeposits = []
@@ -321,11 +319,10 @@
         spawnBromide()
       }
 
-      // animation loop
+
       function animate() {
         requestAnimationFrame(animate)
 
-        // Process Zincooo Red
         for (let i = activeZincIons.length - 1; i >= 0; i--) {
           let zn = activeZincIons[i]
           zn.userData.t -= zn.userData.speed
@@ -334,7 +331,7 @@
           zn.position.copy(pos).add(zn.userData.offset)
 
           if (zn.userData.t <= zn.userData.targetT) {
-            // zwo electrons moving DOWN the cathode wire
+
             spawnElectron(-4, 9, 4, false, 0.2)
             spawnElectron(-4, 9.5, 4, false, -0.2)
 
@@ -365,11 +362,11 @@
             scene.remove(br)
             activeBromideIons.splice(i, 1)
 
-            // one electron moving UP the anode wire pro 1 Br-
+          
             spawnElectron(4, 4, 9, true, (Math.random() - 0.5) * 0.2)
 
             pendingBr++
-            // 2 Br- marriage to 1 Br2
+       
             if (pendingBr >= 2) {
               pendingBr = 0
 
@@ -398,7 +395,7 @@
           }
         }
 
-        // e- on the hot tin roof
+     
         for (let i = activeElectrons.length - 1; i >= 0; i--) {
           let e = activeElectrons[i]
           if (e.userData.isUpward) {
@@ -416,7 +413,7 @@
           }
         }
 
-        // Br2 drift anode
+   
         for (let i = bromineMolecules.length - 1; i >= 0; i--) {
           let b = bromineMolecules[i]
           b.position.x += (Math.random() - 0.5) * 0.015
@@ -438,7 +435,7 @@
           b.rotation.y += 0.03
         }
 
-        // Rotation
+     
         scene.rotation.y = Math.sin(Date.now() * 0.0003) * 0.1
 
         renderer.render(scene, camera)
