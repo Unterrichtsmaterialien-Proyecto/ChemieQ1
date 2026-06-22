@@ -207,7 +207,6 @@
             outline: none;
         }
 
-        /* Buttons & Feedback */
         .buttons {
             margin-top: 25px;
         }
@@ -282,12 +281,10 @@
 
 <script>
     function switchTab(tabId) {
-        // Update Buttons
         document.getElementById('tab-ox').classList.remove('active');
         document.getElementById('tab-redox').classList.remove('active');
         document.getElementById('tab-' + tabId).classList.add('active');
 
-        // Update Views
         document.getElementById('view-ox').classList.remove('active');
         document.getElementById('view-redox').classList.remove('active');
         document.getElementById('view-' + tabId).classList.add('active');
@@ -353,10 +350,10 @@
 
         const feedbackElement = document.getElementById('ox-feedback');
         if (allCorrect) {
-            feedbackElement.innerText = "Richtig! Gut gemacht.";
+            feedbackElement.innerText = "Richtig! :)";
             feedbackElement.className = "feedback correct";
         } else {
-            feedbackElement.innerText = "Leider falsch oder unvollständig. Bitte versuche es noch einmal!";
+            feedbackElement.innerText = "Leider falsch oder unvollständig.. versuche es noch einmal!";
             feedbackElement.className = "feedback incorrect";
         }
     }
@@ -379,7 +376,7 @@
         },
         {
             eq: "Cl<sub>2</sub> + 2 Li &rarr; 2 Cl<sup>-</sup> + 2 Li<sup>+</sup>",
-            ox_html: "<input class='coeff' id='ox0'> Li &rarr; <input class='coeff' id='ox1'> 2 Li<sup>+</sup> + <input class='coeff' id='ox2'> e<sup>-</sup>",
+            ox_html: "<input class='coeff' id='ox0'> Li &rarr; <input class='coeff' id='ox1'> Li<sup>+</sup> + <input class='coeff' id='ox2'> e<sup>-</sup>",
             ox_ans: [2, 2, 2],
             red_html: "<input class='coeff' id='red0'> Cl<sub>2</sub> + <input class='coeff' id='red1'> e<sup>-</sup> &rarr; <input class='coeff' id='red2'> Cl<sup>-</sup>",
             red_ans: [1, 2, 2]
@@ -394,9 +391,9 @@
         {
             eq: "2 Al + 3 Zn<sup>2+</sup> &rarr; 2 Al<sup>3+</sup> + 3 Zn",
             ox_html: "<input class='coeff' id='ox0'> Al &rarr; <input class='coeff' id='ox1'> Al<sup>3+</sup> + <input class='coeff' id='ox2'> e<sup>-</sup>",
-            ox_ans: [1, 1, 3],
+            ox_ans: [2, 2, 6],
             red_html: "<input class='coeff' id='red0'> Zn<sup>2+</sup> + <input class='coeff' id='red1'> e<sup>-</sup> &rarr; <input class='coeff' id='red2'> Zn",
-            red_ans: [1, 2, 1]
+            red_ans: [3, 6, 3]
         }
     ];
 
