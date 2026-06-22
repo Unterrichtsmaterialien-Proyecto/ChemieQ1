@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemie Übungen: Oxidation & Redox</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <style>
+        .exam-countdown-container {
+            /* Positioning */
+            position: fixed; 
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999; 
+            
+            /* Visuals */
+            color: #FFB300; /* Orange-yellow */
+            opacity: 0.5;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8); /* Guarantees visibility on any background */
+            
+            /* Usability */
+            pointer-events: none; /* Ensures the timer doesn't disturb clicks on the webpage */
+        }
+
+        .exam-countdown-label {
+            font-size: 16px;
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+
+        .exam-countdown-timer {
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="exam-countdown-container">
+        <div class="exam-countdown-label">Zeit bis zur Klausur:</div>
+        <div class="exam-countdown-timer" id="klausur-timer">Berechne...</div>
+    </div>
+
+    <script>
+        // Set target date: Thursday, June 25, 2026 at 10:50 AM
+        const targetDate = new Date("Jun 25, 2026 10:50:00").getTime();
+
+        const timerInterval = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            // Calculate days, hours, minutes, and seconds
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the result
+            document.getElementById("klausur-timer").innerHTML = 
+                days + "T " + hours + "Std " + minutes + "Min " + seconds + "Sek";
+
+            // Stop the timer when the date is reached
+            if (distance < 0) {
+                clearInterval(timerInterval);
+                document.getElementById("klausur-timer").innerHTML = "Die Zeit ist abgelaufen!";
+            }
+        }, 1000);
+    </script>
+
+</body>
+</html>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 650px;
+            text-align: center;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+        }
+        .tab-btn {
+            background-color: transparent;
+            color: #7f8c8d;
+            border: 2px solid #bdc3c7;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover {
+            background-color: #ecf0f1;
+        }
+        .tab-btn.active {
+            background-color: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+        }
+        .view {
+            display: none;
+        }
+        .view.active {
+            display: block;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        p.description {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .formula {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2980b9;
+            margin: 20px 0;
+            letter-spacing: 2px;
+        }
+        
+        /* Oxidationszahlen Styles */
+        .input-group {
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .input-group label {
+            font-size: 18px;
+            font-weight: bold;
+            width: 40px;
+            text-align: right;
+        }
+        .input-group input {
+            width: 60px;
+            padding: 8px;
+            font-size: 16px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        .input-group input:focus {
+            border-color: #2980b9;
+            outline: none;
+        }
+
+        /* Redox Styles */
+        .half-eq-container {
+            margin: 15px 0;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        .half-eq-label {
+            font-weight: bold;
+            color: #e67e22;
+            margin-bottom: 10px;
+            text-align: left;
+            font-size: 18px;
+        }
+        .half-eq {
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .coeff {
+            width: 40px;
+            text-align: center;
+            font-size: 16px;
+            padding: 5px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        .coeff:focus {
+            border-color: #e67e22;
+            outline: none;
+        }
+
+        /* Buttons & Feedback */
+        .buttons {
+            margin-top: 25px;
+        }
+        button.action-btn {
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: background-color 0.3s;
+        }
+        button.action-btn:hover {
+            background-color: #1c5980;
+        }
+        .feedback {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 25px;
+        }
+        .correct { color: #27ae60; }
+        .incorrect { color: #e74c3c; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="tabs">
+        <button class="tab-btn active" id="tab-ox" onclick="switchTab('ox')">Oxidationszahlen</button>
+        <button class="tab-btn" id="tab-redox" onclick="switchTab('redox')">Redox-Teilgleichungen</button>
+    </div>
+
+    <div id="view-ox" class="view active">
+        <h1>Oxidationszahlen bestimmen</h1>
+        <p class="description">Gib die korrekte Oxidationszahl für jedes Element in der angezeigten Verbindung ein (z.B. +1, -2, 0).</p>
+        
+        <div class="formula" id="ox-formula-display"></div>
+        
+        <div id="ox-inputs-container"></div>
+        
+        <div class="buttons">
+            <button class="action-btn" onclick="checkOxAnswers()">Überprüfen</button>
+            <button class="action-btn" onclick="loadRandomCompound()">Nächste Verbindung</button>
+        </div>
+        
+        <div id="ox-feedback" class="feedback"></div>
+    </div>
+
+    <div id="view-redox" class="view">
+        <h1>Redox-Teilgleichungen ausgleichen</h1>
+        <p class="description">Gleiche die Teilgleichungen aus. Trage die passenden Koeffizienten und die Anzahl der Elektronen ein. <strong>Wichtig: Trage auch eine "1" ein, wenn der Koeffizient 1 ist.</strong></p>
+        
+        <div class="formula" id="redox-eq-display"></div>
+        
+        <div class="half-eq-container" id="ox-container"></div>
+        <div class="half-eq-container" id="red-container"></div>
+        
+        <div class="buttons">
+            <button class="action-btn" style="background-color: #e67e22;" onclick="checkRedoxAnswers()">Überprüfen</button>
+            <button class="action-btn" style="background-color: #e67e22;" onclick="loadRandomRedox()">Nächste Gleichung</button>
+        </div>
+        
+        <div id="redox-feedback" class="feedback"></div>
+    </div>
+
+</div>
+
+<script>
+    // Tab Navigation Logic
+    function switchTab(tabId) {
+        // Update Buttons
+        document.getElementById('tab-ox').classList.remove('active');
+        document.getElementById('tab-redox').classList.remove('active');
+        document.getElementById('tab-' + tabId).classList.add('active');
+
+        // Update Views
+        document.getElementById('view-ox').classList.remove('active');
+        document.getElementById('view-redox').classList.remove('active');
+        document.getElementById('view-' + tabId).classList.add('active');
+    }
+
+    /* =========================================
+       LOGIK FÜR OXIDATIONSZAHLEN
+       ========================================= */
+    const compounds = [
+        { formula: "H<sub>2</sub>O", elements: [{ sym: "H", ox: 1 }, { sym: "O", ox: -2 }] },
+        { formula: "CO<sub>2</sub>", elements: [{ sym: "C", ox: 4 }, { sym: "O", ox: -2 }] },
+        { formula: "NaCl", elements: [{ sym: "Na", ox: 1 }, { sym: "Cl", ox: -1 }] },
+        { formula: "H<sub>2</sub>SO<sub>4</sub>", elements: [{ sym: "H", ox: 1 }, { sym: "S", ox: 6 }, { sym: "O", ox: -2 }] },
+        { formula: "NH<sub>3</sub>", elements: [{ sym: "N", ox: -3 }, { sym: "H", ox: 1 }] },
+        { formula: "KMnO<sub>4</sub>", elements: [{ sym: "K", ox: 1 }, { sym: "Mn", ox: 7 }, { sym: "O", ox: -2 }] },
+        { formula: "CuCl<sub>2</sub>", elements: [{ sym: "Cu", ox: 2 }, { sym: "Cl", ox: -1 }] },
+        { formula: "ZnBr<sub>2</sub>", elements: [{ sym: "Zn", ox: 2 }, { sym: "Br", ox: -1 }] },
+        { formula: "MgCl<sub>2</sub>", elements: [{ sym: "Mg", ox: 2 }, { sym: "Cl", ox: -1 }] },
+        { formula: "AgNO<sub>3</sub>", elements: [{ sym: "Ag", ox: 1 }, { sym: "N", ox: 5 }, { sym: "O", ox: -2 }] },
+        { formula: "KI", elements: [{ sym: "K", ox: 1 }, { sym: "I", ox: -1 }] },
+        { formula: "HClO<sub>3</sub>", elements: [{ sym: "H", ox: 1 }, { sym: "Cl", ox: 5 }, { sym: "O", ox: -2 }] }
+    ];
+
+    let currentCompound = null;
+
+    function loadRandomCompound() {
+        const randomIndex = Math.floor(Math.random() * compounds.length);
+        currentCompound = compounds[randomIndex];
+
+        document.getElementById('ox-formula-display').innerHTML = currentCompound.formula;
+
+        const inputsContainer = document.getElementById('ox-inputs-container');
+        inputsContainer.innerHTML = ''; 
+        document.getElementById('ox-feedback').innerHTML = '';
+
+        currentCompound.elements.forEach((el, index) => {
+            const group = document.createElement('div');
+            group.className = 'input-group';
+            
+            const label = document.createElement('label');
+            label.innerText = el.sym + ':';
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = 'ox-input-' + index;
+            input.placeholder = '+/-';
+            input.autocomplete = 'off';
+
+            group.appendChild(label);
+            group.appendChild(input);
+            inputsContainer.appendChild(group);
+        });
+    }
+
+    function checkOxAnswers() {
+        if (!currentCompound) return;
+        let allCorrect = true;
+
+        currentCompound.elements.forEach((el, index) => {
+            const inputVal = document.getElementById('ox-input-' + index).value.trim();
+            const parsedInput = parseInt(inputVal, 10);
+            if (isNaN(parsedInput) || parsedInput !== el.ox) {
+                allCorrect = false;
+            }
+        });
+
+        const feedbackElement = document.getElementById('ox-feedback');
+        if (allCorrect) {
+            feedbackElement.innerText = "Richtig! Gut gemacht.";
+            feedbackElement.className = "feedback correct";
+        } else {
+            feedbackElement.innerText = "Leider falsch oder unvollständig. Bitte versuche es noch einmal!";
+            feedbackElement.className = "feedback incorrect";
+        }
+    }
+
+    /* =========================================
+       LOGIK FÜR REDOX-TEILGLEICHUNGEN
+       ========================================= */
+    const redoxReactions = [
+        {
+            eq: "Zn + Cu<sup>2+</sup> &rarr; Zn<sup>2+</sup> + Cu",
+            ox_html: "<input class='coeff' id='ox0'> Zn &rarr; <input class='coeff' id='ox1'> Zn<sup>2+</sup> + <input class='coeff' id='ox2'> e<sup>-</sup>",
+            ox_ans: [1, 1, 2],
+            red_html: "<input class='coeff' id='red0'> Cu<sup>2+</sup> + <input class='coeff' id='red1'> e<sup>-</sup> &rarr; <input class='coeff' id='red2'> Cu",
+            red_ans: [1, 2, 1]
+        },
+        {
+            eq: "Cu + 2 Ag<sup>+</sup> &rarr; Cu<sup>2+</sup> + 2 Ag",
+            ox_html: "<input class='coeff' id='ox0'> Cu &rarr; <input class='coeff' id='ox1'> Cu<sup>2+</sup> + <input class='coeff' id='ox2'> e<sup>-</sup>",
+            ox_ans: [1, 1, 2],
+            red_html: "<input class='coeff' id='red0'> Ag<sup>+</sup> + <input class='coeff' id='red1'> e<sup>-</sup> &rarr; <input class='coeff' id='red2'> Ag",
+            red_ans: [1, 1, 1]
+        },
+        {
+            eq: "Cl<sub>2</sub> + 2 Br<sup>-</sup> &rarr; 2 Cl<sup>-</sup> + Br<sub>2</sub>",
+            ox_html: "<input class='coeff' id='ox0'> Br<sup>-</sup> &rarr; <input class='coeff' id='ox1'> Br<sub>2</sub> + <input class='coeff' id='ox2'> e<sup>-</sup>",
+            ox_ans: [2, 1, 2],
+            red_html: "<input class='coeff' id='red0'> Cl<sub>2</sub> + <input class='coeff' id='red1'> e<sup>-</sup> &rarr; <input class='coeff' id='red2'> Cl<sup>-</sup>",
+            red_ans: [1, 2, 2]
+        },
+        {
+            eq: "Mg + I<sub>2</sub> &rarr; Mg<sup>2+</sup> + 2 I<sup>-</sup>",
+            ox_html: "<input class='coeff' id='ox0'> Mg &rarr; <input class='coeff' id='ox1'> Mg<sup>2+</sup> + <input class='coeff' id='ox2'> e<sup>-</sup>",
+            ox_ans: [1, 1, 2],
+            red_html: "<input class='coeff' id='red0'> I<sub>2</sub> + <input class='coeff' id='red1'> e<sup>-</sup> &rarr; <input class='coeff' id='red2'> I<sup>-</sup>",
+            red_ans: [1, 2, 2]
+        },
+        {
+            eq: "2 Al + 3 Zn<sup>2+</sup> &rarr; 2 Al<sup>3+</sup> + 3 Zn",
+            ox_html: "<input class='coeff' id='ox0'> Al &rarr; <input class='coeff' id='ox1'> Al<sup>3+</sup> + <input class='coeff' id='ox2'> e<sup>-</sup>",
+            ox_ans: [1, 1, 3],
+            red_html: "<input class='coeff' id='red0'> Zn<sup>2+</sup> + <input class='coeff' id='red1'> e<sup>-</sup> &rarr; <input class='coeff' id='red2'> Zn",
+            red_ans: [1, 2, 1]
+        }
+    ];
+
+    let currentRedox = null;
+
+    function loadRandomRedox() {
+        const randomIndex = Math.floor(Math.random() * redoxReactions.length);
+        currentRedox = redoxReactions[randomIndex];
+
+        document.getElementById('redox-eq-display').innerHTML = currentRedox.eq;
+        
+        document.getElementById('ox-container').innerHTML = 
+            "<div class='half-eq-label'>Oxidation:</div><div class='half-eq'>" + currentRedox.ox_html + "</div>";
+            
+        document.getElementById('red-container').innerHTML = 
+            "<div class='half-eq-label'>Reduktion:</div><div class='half-eq'>" + currentRedox.red_html + "</div>";
+
+        document.getElementById('redox-feedback').innerHTML = '';
+        document.getElementById('redox-feedback').className = 'feedback';
+    }
+
+    function checkRedoxAnswers() {
+        if (!currentRedox) return;
+        let allCorrect = true;
+
+        // Es gibt jeweils 3 Input-Felder (Index 0, 1, 2) für Ox und Red
+        for(let i = 0; i < 3; i++) {
+            let oxVal = parseInt(document.getElementById('ox' + i).value.trim(), 10);
+            if (isNaN(oxVal) || oxVal !== currentRedox.ox_ans[i]) allCorrect = false;
+
+            let redVal = parseInt(document.getElementById('red' + i).value.trim(), 10);
+            if (isNaN(redVal) || redVal !== currentRedox.red_ans[i]) allCorrect = false;
+        }
+
+        const feedbackElement = document.getElementById('redox-feedback');
+        if (allCorrect) {
+            feedbackElement.innerText = "Richtig! Die Teilgleichungen sind ausgeglichen.";
+            feedbackElement.className = "feedback correct";
+        } else {
+            feedbackElement.innerText = "Fehlerhaft! Denke daran, auch die '1' in leere Felder einzutragen.";
+            feedbackElement.className = "feedback incorrect";
+        }
+    }
+
+    // Beim Laden der Seite beide Übungen initialisieren
+    window.onload = function() {
+        loadRandomCompound();
+        loadRandomRedox();
+    };
+</script>
+
+</body>
+</html>
