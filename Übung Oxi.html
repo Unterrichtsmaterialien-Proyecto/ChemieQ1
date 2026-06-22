@@ -282,7 +282,6 @@
 </div>
 
 <script>
-    // Tab Navigation Logic
     function switchTab(tabId) {
         // Update Buttons
         document.getElementById('tab-ox').classList.remove('active');
@@ -295,9 +294,6 @@
         document.getElementById('view-' + tabId).classList.add('active');
     }
 
-    /* =========================================
-       LOGIK FÜR OXIDATIONSZAHLEN
-       ========================================= */
     const compounds = [
         { formula: "H<sub>2</sub>O", elements: [{ sym: "H", ox: 1 }, { sym: "O", ox: -2 }] },
         { formula: "CO<sub>2</sub>", elements: [{ sym: "C", ox: 4 }, { sym: "O", ox: -2 }] },
@@ -366,9 +362,7 @@
         }
     }
 
-    /* =========================================
-       LOGIK FÜR REDOX-TEILGLEICHUNGEN
-       ========================================= */
+
     const redoxReactions = [
         {
             eq: "Zn + Cu<sup>2+</sup> &rarr; Zn<sup>2+</sup> + Cu",
@@ -385,8 +379,8 @@
             red_ans: [1, 1, 1]
         },
         {
-            eq: "Cl<sub>2</sub> + 2 Br<sup>-</sup> &rarr; 2 Cl<sup>-</sup> + Br<sub>2</sub>",
-            ox_html: "<input class='coeff' id='ox0'> Br<sup>-</sup> &rarr; <input class='coeff' id='ox1'> Br<sub>2</sub> + <input class='coeff' id='ox2'> e<sup>-</sup>",
+            eq: "Cl<sub>2</sub> + 2 Li &rarr; 2 Cl<sup>-</sup> + 2 Li<sup>+</sup>",
+            ox_html: "<input class='coeff' id='ox0'> Li &rarr; <input class='coeff' id='ox1'> 2 Li<sup>+</sup> + <input class='coeff' id='ox2'> e<sup>-</sup>",
             ox_ans: [2, 1, 2],
             red_html: "<input class='coeff' id='red0'> Cl<sub>2</sub> + <input class='coeff' id='red1'> e<sup>-</sup> &rarr; <input class='coeff' id='red2'> Cl<sup>-</sup>",
             red_ans: [1, 2, 2]
@@ -429,7 +423,6 @@
         if (!currentRedox) return;
         let allCorrect = true;
 
-        // Es gibt jeweils 3 Input-Felder (Index 0, 1, 2) für Ox und Red
         for(let i = 0; i < 3; i++) {
             let oxVal = parseInt(document.getElementById('ox' + i).value.trim(), 10);
             if (isNaN(oxVal) || oxVal !== currentRedox.ox_ans[i]) allCorrect = false;
@@ -443,7 +436,7 @@
             feedbackElement.innerText = "Richtig! Die Teilgleichungen sind ausgeglichen.";
             feedbackElement.className = "feedback correct";
         } else {
-            feedbackElement.innerText = "Fehlerhaft! Denke daran, auch die '1' in leere Felder einzutragen.";
+            feedbackElement.innerText = "Leider nein! :/ (Hast du die 1 in die leeren Felder eingetragen?)";
             feedbackElement.className = "feedback incorrect";
         }
     }
