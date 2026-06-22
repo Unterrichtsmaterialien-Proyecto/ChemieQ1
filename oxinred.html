@@ -372,7 +372,7 @@
             ox_html: "<input class='coeff' id='ox0'> Cu &rarr; <input class='coeff' id='ox1'> Cu<sup>2+</sup> + <input class='coeff' id='ox2'> e<sup>-</sup>",
             ox_ans: [1, 1, 2],
             red_html: "<input class='coeff' id='red0'> Ag<sup>+</sup> + <input class='coeff' id='red1'> e<sup>-</sup> &rarr; <input class='coeff' id='red2'> Ag",
-            red_ans: [1, 1, 1]
+            red_ans: [2, 2, 2]
         },
         {
             eq: "Cl<sub>2</sub> + 2 Li &rarr; 2 Cl<sup>-</sup> + 2 Li<sup>+</sup>",
@@ -429,7 +429,7 @@
 
         const feedbackElement = document.getElementById('redox-feedback');
         if (allCorrect) {
-            feedbackElement.innerText = "Richtig! Die Teilgleichungen sind ausgeglichen.";
+            feedbackElement.innerText = "Richtig! :).";
             feedbackElement.className = "feedback correct";
         } else {
             feedbackElement.innerText = "Leider nein! :/ (Hast du die 1 in die leeren Felder eingetragen?)";
