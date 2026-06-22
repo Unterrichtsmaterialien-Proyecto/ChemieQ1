@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chemie Übungen: Oxidation & Redox</title>
+    <title>Oxidation & Redox</title>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,27 +50,26 @@
     </div>
 
     <script>
-        // Set target date: Thursday, June 25, 2026 at 10:50 AM
         const targetDate = new Date("Jun 25, 2026 10:50:00").getTime();
 
         const timerInterval = setInterval(function() {
             const now = new Date().getTime();
             const distance = targetDate - now;
 
-            // Calculate days, hours, minutes, and seconds
+         
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            // Display the result
+           
             document.getElementById("klausur-timer").innerHTML = 
                 days + "T " + hours + "Std " + minutes + "Min " + seconds + "Sek";
 
-            // Stop the timer when the date is reached
+    
             if (distance < 0) {
                 clearInterval(timerInterval);
-                document.getElementById("klausur-timer").innerHTML = "Die Zeit ist abgelaufen!";
+                document.getElementById("klausur-timer").innerHTML = "Viel Erfolg bei der Klausur!";
             }
         }, 1000);
     </script>
@@ -149,7 +148,6 @@
             letter-spacing: 2px;
         }
         
-        /* Oxidationszahlen Styles */
         .input-group {
             margin: 15px 0;
             display: flex;
@@ -176,7 +174,6 @@
             outline: none;
         }
 
-        /* Redox Styles */
         .half-eq-container {
             margin: 15px 0;
             background: #f9f9f9;
@@ -251,7 +248,7 @@
 
     <div id="view-ox" class="view active">
         <h1>Oxidationszahlen bestimmen</h1>
-        <p class="description">Gib die korrekte Oxidationszahl für jedes Element in der angezeigten Verbindung ein (z.B. +1, -2, 0).</p>
+        <p class="description">Gib die Oxidationszahl für jedes Element in der angezeigten Verbindung ein (z.B. +1, -2, 0).</p>
         
         <div class="formula" id="ox-formula-display"></div>
         
@@ -267,7 +264,8 @@
 
     <div id="view-redox" class="view">
         <h1>Redox-Teilgleichungen ausgleichen</h1>
-        <p class="description">Gleiche die Teilgleichungen aus. Trage die passenden Koeffizienten und die Anzahl der Elektronen ein. <strong>Wichtig: Trage auch eine "1" ein, wenn der Koeffizient 1 ist.</strong></p>
+        
+        <p class="description">Gleiche die Teilgleichungen aus. Trage die passenden Koeffizienten und die Anzahl der Elektronen ein. <strong>Wenn der Koeffizient 1 ist, 1 eintragen ;).</strong></p>
         
         <div class="formula" id="redox-eq-display"></div>
         
